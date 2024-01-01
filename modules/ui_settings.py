@@ -41,7 +41,7 @@ class SettingsWindow(QDialog):
         self.setWindowTitle('AnimeGameLauncher')
         self.setWindowIcon(QIcon('resources/icons/app_icon.png'))
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setFixedSize(QSize(820, 525))
+        self.setFixedSize(QSize(1000, 525))
         screen_size = QScreen.availableGeometry(QApplication.primaryScreen())
         position_x = (screen_size.width() - self.width()) / 2
         position_y = (screen_size.height() - self.height()) / 2
@@ -98,6 +98,9 @@ class SettingsWindow(QDialog):
 
         self.btn_locate_genshin_path = QPushButton(parent=self.scroll_container, text='Locate game files (Genshin)', objectName='btn_locate_genshin_path')
         self.btn_locate_genshin_path.clicked.connect(self.btn_locate_genshin_path_event)
+
+        self.btn_locate_starrail_path = QPushButton(parent=self.scroll_container, text='Locate game files (StarRail)', objectName='btn_locate_starrail_path')
+        self.btn_locate_starrail_path.clicked.connect(self.btn_locate_starrail_path_event)
 
         # ==================== Game List ==================== #
         self.game_list = QComboBox(parent=self.scroll_container, objectName='game_list')
@@ -206,7 +209,7 @@ class SettingsWindow(QDialog):
 
         # ==================== Launcher Background ==================== #
         self.background_image = QLabel(parent=self, text=None, objectName='background_image')
-        self.background_image.setFixedSize(QSize(820, 525))
+        self.background_image.setFixedSize(QSize(1000, 525))
         self.background_image.setScaledContents(True)
         self.background_image.setPixmap(QPixmap(background_image))
 
@@ -558,6 +561,28 @@ class SettingsWindow(QDialog):
                     background-color: rgb(251, 248, 239);
                 }
                 QPushButton#btn_locate_genshin_path:pressed {
+                    background-color: rgb(236, 233, 225);
+                }
+            """
+        )
+
+        self.btn_locate_starrail_path.setFixedSize(QSize(240, 40))
+        self.btn_locate_starrail_path.move(565, 160)
+        self.btn_locate_starrail_path.setStyleSheet(
+            """
+                QPushButton#btn_locate_starrail_path, QPushButton#btn_locate_starrail_path:hover, QPushButton#btn_locate_starrail_path:pressed {
+                    border: 1px solid rgb(204, 204, 204);
+                    border-radius: 5px;
+                    color: rgb(220, 188, 96);
+                    font: 13pt "Segoe UI";
+                }
+                QPushButton#btn_locate_starrail_path {
+                    background-color: rgb(255, 255, 255);
+                }
+                QPushButton#btn_locate_starrail_path:hover {
+                    background-color: rgb(251, 248, 239);
+                }
+                QPushButton#btn_locate_starrail_path:pressed {
                     background-color: rgb(236, 233, 225);
                 }
             """
