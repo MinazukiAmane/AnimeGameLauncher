@@ -442,7 +442,7 @@ class MainWindow(QMainWindow):
         self.btn_url_swap2 = QPushButton(self, text=None, objectName='btn_url_swap', flat=True)
         self.btn_url_swap2.setFixedSize(QSize(63, 63))
         self.btn_url_swap2.move(20, 557)
-        if (game_name == ('genshin' or 'honkai')):
+        if (game_name == ('genshin' or 'honkai' or 'starrail')):
             self.btn_url_swap2.hide()
         self.btn_url_swap2.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
         self.btn_url_swap2.setStyleSheet(
@@ -475,43 +475,6 @@ class MainWindow(QMainWindow):
                 """
                     )
         self.btn_url_swap2.clicked.connect(lambda: self.btn_url_event('genshin'))
-
-        self.btn_url_swap3 = QPushButton(self, text=None, objectName='btn_url_swap', flat=True)
-        self.btn_url_swap3.setFixedSize(QSize(63, 63))
-        self.btn_url_swap3.move(20, 557)
-        if (game_name == ('starrail' 'honkai')):
-            self.btn_url_swap3.hide()
-        self.btn_url_swap3.setCursor(QCursor(QtCore.Qt.PointingHandCursor))
-        self.btn_url_swap3.setStyleSheet(
-                """
-                    QPushButton#btn_url_swap, QPushButton#btn_url_swap:hover, QPushButton#btn_url_swap:pressed {
-                        border-radius: 10px;
-                        background-repeat: no-repeat;
-                        background-position: center;
-                    }
-
-                    QPushButton#btn_url_swap:hover, QPushButton#btn_url_swap:pressed {
-                        background-color: rgba(20, 20, 20, 0.9);
-                    }
-
-                    QPushButton#btn_url_swap {
-                        border: 2px solid rgba(255, 255, 255, 0);
-                        background-image: url(resources/icons/change_game/starrail.png);
-                        background-color: rgba(20, 20, 20, 0.6);
-                    }
-
-                    QPushButton#btn_url_swap:hover {
-                        border: 2px solid rgb(255, 225, 145);
-                        background-image: url(resources/icons/change_game/starrail.png);
-                    }
-
-                    QPushButton#btn_url_swap:pressed {
-                        border: 2px solid rgb(255, 205, 125);
-                        background-image: url(resources/icons/change_game/starrail.png);
-                    }
-                """
-                    )
-        self.btn_url_swap3.clicked.connect(lambda: self.btn_url_event('starrail'))
         self.choose = QPushButton(self, text=' Switch Game ', objectName='choose', flat=True)
         self.choose.setFixedSize(QSize(105, 30))
         self.choose.move(20, 523)
@@ -718,7 +681,7 @@ def global_variables():
             game_exe = 'StarRail.exe'
             game_exe_path = starrail_path.joinpath(game_exe)
             game_index = 2
-            launcher_image = background_image_path.joinpath('genshin.png')
+            launcher_image = background_image_path.joinpath('starrail.png')
         case _:
             game_exe = ''
             game_exe_path = ''
