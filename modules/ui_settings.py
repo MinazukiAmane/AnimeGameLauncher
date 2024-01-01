@@ -1,15 +1,31 @@
-from email.policy import default
-from modules.hl_utils import get_details, get_res, get_general, define
-import modules.resources
-from modules.hl_utils import update_c_version
-from PySide6 import QtCore
-from PySide6.QtCore import (QPoint, QSize)
-from PySide6.QtGui import (QScreen, QPixmap, QIcon, QFont)
-from PySide6.QtWidgets import (QApplication, QFileDialog, QDialog, QGroupBox, QLabel, QPushButton, QRadioButton, QComboBox, QScrollArea, QWidget)
+try:
+    import modules.ui_main
+    import modules.configuration
+    from PySide6 import QtCore
+    from PySide6.QtCore import (QPoint, QSize)
+    from PySide6.QtGui import (QScreen, QPixmap, QIcon, QFont)
+    from PySide6.QtWidgets import (QApplication, QFileDialog, QDialog, QGroupBox, QLabel, QPushButton, QRadioButton, QComboBox, QScrollArea, QWidget)
+except ImportError as import_error:
+    print(
+        'An error has occurred when importing modules!\n\n' + 
+        f'>>> {import_error}'
+    )
 
+    exit()
+except Exception as unknown_error:
+    print(
+        'An unknown error has occurred!\n\n' + 
+        f'>>> {unknown_error}'
+    )
+
+    exit()
+else:
+    pass
+
+
+ui_config_write = modules.configuration.write
 
 class SettingsWindow(QDialog):
-
     def __init__(self):
         super().__init__()
 
@@ -17,17 +33,13 @@ class SettingsWindow(QDialog):
 
         return None
     
-    def interface(self):        
-        game_name, wallpaper_name, default = get_general()
-        del wallpaper_name, default
+    def interface(self):
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path = global_variables()
+        del game_exe, game_exe_path, background_image
 
-        screen_width, screen_height = get_res(game_name)
-        gam_ver, ren_ver, game_loc, launcher_loc = get_details(game_name)
-        del gam_ver, ren_ver
-
-
+        # ==================== Window Properties ==================== #
         self.setWindowTitle('AnimeGameLauncher')
-        self.setWindowIcon(QIcon(':/resources/icons/app_icon.png'))
+        self.setWindowIcon(QIcon('resources/icons/app_icon.png'))
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
         self.setFixedSize(QSize(820, 525))
         screen_size = QScreen.availableGeometry(QApplication.primaryScreen())
@@ -35,10 +47,10 @@ class SettingsWindow(QDialog):
         position_y = (screen_size.height() - self.height()) / 2
         self.move(position_x, position_y)
 
+        # ==================== Labels ==================== #
+        self.lbl_window_title = QLabel(parent=self, text='✦Settings', objectName='lbl_window_title')
 
-        self.lbl_window_title = QLabel(parent=self, text='Settings', objectName='lbl_window_title')
-
-
+        # ==================== Buttons ==================== #
         self.btn_close = QPushButton(parent=self, text=None, objectName='btn_close', flat=True)
         self.btn_close.clicked.connect(self.close)
 
@@ -60,77 +72,145 @@ class SettingsWindow(QDialog):
         #
         # Defines below any items to be put inside the scroll area
         #
-
+        # ==================== Scroll Area & Container ==================== #
         self.scroll_area = QScrollArea(parent=self, objectName='scroll_area')
         self.scroll_container = QWidget(parent=self, objectName='scroll_container')
         self.scroll_area.setWidget(self.scroll_container)
 
-
-        #self.lbl_default_game = QLabel(parent=self.scroll_container, text='Default game', objectName='lbl_default_game')
-
-        self.lbl_path_t = QLabel(parent=self.scroll_container, text='Game Folder Location', objectName='lbl_path_t')
-        self.lbl_path = QLabel(parent=self.scroll_container, text=game_loc, objectName='lbl_path')
-        
-        self.lbl_launcher_path_t = QLabel(parent=self.scroll_container, text='Launcher Executable Location', objectName='lbl_launcher_path_t')
-        self.lbl_launcher_path = QLabel(parent=self.scroll_container, text=launcher_loc, objectName='lbl_launcher_path')
-        
+        # ==================== Labels ==================== #
+        self.lbl_default_game = QLabel(parent=self.scroll_container, text='Default game', objectName='lbl_default_game')
+        self.lbl_game_paths = QLabel(parent=self.scroll_container, text='Game paths', objectName='lbl_game_paths')
+        self.lbl_current_paths = QLabel(parent=self.scroll_container, text='Current paths are set to', objectName='lbl_current_paths')
+        self.lbl_path_honkai = QLabel(parent=self.scroll_container, text=str(honkai_path), objectName='lbl_path_honkai')
+        self.lbl_path_genshin = QLabel(parent=self.scroll_container, text=str(genshin_path), objectName='lbl_path_genshin')
+        self.lbl_path_starrail = QLabel(parent=self.scroll_container, text=str(starrail_path), objectName='lbl_path_starrail')
         self.lbl_screen_resolution = QLabel(parent=self.scroll_container, text='Screen resolution', objectName='lbl_screen_resolution')
-        
-        
         self.lbl_launcher_version = QLabel(parent=self.scroll_container, text='Launcher version', objectName='lbl_launcher_version')
-        self.lbl_current_version = QLabel(parent=self.scroll_container, text='Current version: 1.1', objectName='lbl_current_version')
+        self.lbl_current_version = QLabel(parent=self.scroll_container, text='Current version: 1.1.5', objectName='lbl_current_version')
         self.lbl_about = QLabel(parent=self.scroll_container, text='About', objectName='lbl_about')
-        source_code_url = '<a href="http://github.com/MinazukiAmane/AnimeGameLauncher" style="text-decoration: none; color: rgb(220, 188, 96); font: 13pt "Segoe UI";">View source code</a>'
+        source_code_url = '<a href="https://github.com/MinazukiAmane/AnimeGameLauncher" style="text-decoration: none; color: rgb(220, 188, 96); font: 13pt "Segoe UI";">View source code</a>'
         self.lbl_source_code = QLabel(parent=self.scroll_container, text=source_code_url, objectName='lbl_source_code')
         self.lbl_source_code.setOpenExternalLinks(True)
 
-        self.btn_locate_path = QPushButton(parent=self.scroll_container, text=None, objectName='btn_locate_path')
-        self.btn_locate_path.clicked.connect(self.btn_locate_path_event)
+        # ==================== Buttons ==================== #
+        self.btn_locate_honkai_path = QPushButton(parent=self.scroll_container, text='Locate game files (Honkai)', objectName='btn_locate_honkai_path')
+        self.btn_locate_honkai_path.clicked.connect(self.btn_locate_honkai_path_event)
 
-        self.btn_locate_launcher_path = QPushButton(parent=self.scroll_container, text=None, objectName='btn_locate_launcher_path')
-        self.btn_locate_launcher_path.clicked.connect(self.btn_locate_launcher_path_event)
+        self.btn_locate_genshin_path = QPushButton(parent=self.scroll_container, text='Locate game files (Genshin)', objectName='btn_locate_genshin_path')
+        self.btn_locate_genshin_path.clicked.connect(self.btn_locate_genshin_path_event)
 
+        # ==================== Game List ==================== #
+        self.game_list = QComboBox(parent=self.scroll_container, objectName='game_list')
+        self.game_list.addItem('Honkai Impact 3rd')
+        self.game_list.addItem('Genshin Impact')
+        self.game_list.addItem('Honkai: StarRail')
+        self.game_list.setCurrentIndex(game_index)
 
-        #default_game = modules.configuration.defaultgame()
+        # ==================== Group Boxes & Its Items ==================== #
+        self.screen_resolution_container = QGroupBox(parent=self.scroll_container, title=' 16 : 9  |  4 : 3 ', objectName='screen_resolution_container')
+        font = QFont()
+        font.setPointSize(10)
+        self.screen_resolution_container.setFont(font)
 
-        #match default_game:
-        #    case 'honkai':
-        #        game_index_2 = 0
-        #    case 'genshin':
-        #        game_index_2 = 1
-        #    case 'starrail':
-        #        game_index_2 = 2
-        #    case _:
-        #        pass
+        self.screen_resolution_1 = QRadioButton(parent=self.screen_resolution_container, text=' 7680  x  4320 ', objectName='screen_resolution_1')
+        self.screen_resolution_2 = QRadioButton(parent=self.screen_resolution_container, text=' 6400  x  4800 ', objectName='screen_resolution_2')
+        self.screen_resolution_3 = QRadioButton(parent=self.screen_resolution_container, text=' 4096  x  3072 ', objectName='screen_resolution_3')
+        self.screen_resolution_4 = QRadioButton(parent=self.screen_resolution_container, text=' 3840  x  2160 ', objectName='screen_resolution_4')
+        self.screen_resolution_5 = QRadioButton(parent=self.screen_resolution_container, text=' 3200  x  2400 ', objectName='screen_resolution_5')
+        self.screen_resolution_6 = QRadioButton(parent=self.screen_resolution_container, text=' 2560  x  1440 ', objectName='screen_resolution_6')
+        self.screen_resolution_7 = QRadioButton(parent=self.screen_resolution_container, text=' 2048  x  1536 ', objectName='screen_resolution_7')
+        self.screen_resolution_8 = QRadioButton(parent=self.screen_resolution_container, text=' 1920  x  1080 ', objectName='screen_resolution_8')
+        self.screen_resolution_9 = QRadioButton(parent=self.screen_resolution_container, text=' 1600  x  900', objectName='screen_resolution_9')
+        self.screen_resolution_10 = QRadioButton(parent=self.screen_resolution_container, text=' 1440  x  900 ', objectName='screen_resolution_10')
+        self.screen_resolution_11 = QRadioButton(parent=self.screen_resolution_container, text=' 1366  x  768 ', objectName='screen_resolution_11')
+        self.screen_resolution_12 = QRadioButton(parent=self.screen_resolution_container, text=' 1280  x  800 ', objectName='screen_resolution_12')
+        self.screen_resolution_13 = QRadioButton(parent=self.screen_resolution_container, text=' 1280  x  600 ', objectName='screen_resolution_13')
+        self.screen_resolution_14 = QRadioButton(parent=self.screen_resolution_container, text=' 1024  x  768 ', objectName='screen_resolution_14')
+        self.screen_resolution_15 = QRadioButton(parent=self.screen_resolution_container, text=' 1024  x  640 ', objectName='screen_resolution_15')
+        self.screen_resolution_16 = QRadioButton(parent=self.screen_resolution_container, text=' 960  x  540 ', objectName='screen_resolution_16')
+        self.screen_resolution_17 = QRadioButton(parent=self.screen_resolution_container, text=' 800  x  600', objectName='screen_resolution_17')
+        self.screen_resolution_18 = QRadioButton(parent=self.screen_resolution_container, text=' 640  x  480', objectName='screen_resolution_18')
+        self.lbl_attention = QLabel(parent=self.screen_resolution_container, text='*Attention: Game will started at windowed mode, not fullscreen or borderless mode', objectName='screen_resolution_20')
 
-        #self.game_list = QComboBox(parent=self.scroll_container, objectName='game_list')
-        #self.game_list.addItem('Honkai Impact 3rd')
-        #self.game_list.addItem('Genshin Impact')
-        #self.game_list.addItem('Honkai: Star Rail')
-        #self.game_list.setCurrentIndex(game_index_2)
+        self.screen_resolution_group = [
+            self.screen_resolution_1, self.screen_resolution_2, self.screen_resolution_3,
+            self.screen_resolution_4, self.screen_resolution_5, self.screen_resolution_6,
+            self.screen_resolution_7, self.screen_resolution_8, self.screen_resolution_9,
+            self.screen_resolution_10, self.screen_resolution_11, self.screen_resolution_12,
+            self.screen_resolution_13, self.screen_resolution_14, self.screen_resolution_15,
+            self.screen_resolution_16, self.screen_resolution_17, self.screen_resolution_18
+        ]
 
+        for radio_button in self.screen_resolution_group:
+            radio_button.setChecked(False)
 
-        match game_name:
+        match screen_width, screen_height:
+            case 7680, 4320:
+                self.screen_resolution_group[0].setChecked(True)
+            case 6400, 4800:
+                self.screen_resolution_group[1].setChecked(True)
+            case 4096, 3072:
+                self.screen_resolution_group[2].setChecked(True)
+            case 3840, 2160:
+                self.screen_resolution_group[3].setChecked(True)
+            case 3200, 2400:
+                self.screen_resolution_group[4].setChecked(True)
+            case 2560, 1440:
+                self.screen_resolution_group[5].setChecked(True)
+            case 2048, 1536:
+                self.screen_resolution_group[6].setChecked(True)
+            case 1920, 1080:
+                self.screen_resolution_group[7].setChecked(True)
+            case 1600, 900:
+                self.screen_resolution_group[8].setChecked(True)
+            case 1440, 900:
+                self.screen_resolution_group[9].setChecked(True)
+            case 1366, 768:
+                self.screen_resolution_group[10].setChecked(True)
+            case 1280, 800:
+                self.screen_resolution_group[11].setChecked(True)
+            case 1280, 600:
+                self.screen_resolution_group[12].setChecked(True)
+            case 1024, 768:
+                self.screen_resolution_group[13].setChecked(True)
+            case 1024, 640:
+                self.screen_resolution_group[14].setChecked(True)
+            case 960, 540:
+                self.screen_resolution_group[15].setChecked(True)
+            case 800, 600:
+                self.screen_resolution_group[16].setChecked(True)
+            case 640, 480:
+                self.screen_resolution_group[17].setChecked(True)
             case _:
-                self.style()
+                self.screen_resolution_group[12].setChecked(True)
+        
+
+        # ==================== Set Style ==================== #
+        match game_name:
+            case 'honkai':
+                self.style_genshin()
+            case _:
+                self.style_genshin()
+            
 
         self.exec()
 
         return None
 
-    def style_2(self):
+    def style_honkai(self):
         pass
 
-    def style(self):
-        background_image = ':/resources/backgrounds/settings_genshin.png'
+    def style_genshin(self):
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path  = global_variables()
+        del game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, honkai_path, genshin_path, starrail_path
 
-
+        # ==================== Launcher Background ==================== #
         self.background_image = QLabel(parent=self, text=None, objectName='background_image')
         self.background_image.setFixedSize(QSize(820, 525))
         self.background_image.setScaledContents(True)
         self.background_image.setPixmap(QPixmap(background_image))
 
-
+        # ==================== Labels ==================== #
         self.lbl_window_title.setFixedSize(QSize(150, 50))
         self.lbl_window_title.move(32, 18)
         self.lbl_window_title.setStyleSheet(
@@ -143,7 +223,7 @@ class SettingsWindow(QDialog):
         )
         self.lbl_window_title.raise_()
 
-
+        # ==================== Buttons ==================== #
         self.btn_close.setFixedSize(QSize(20, 20))
         self.btn_close.move(765, 35)
         self.btn_close.setStyleSheet(
@@ -152,13 +232,11 @@ class SettingsWindow(QDialog):
                     border: 0px solid rgba(0, 0, 0, 0);
                     border-radius: 0px;
                 }
-
                 QPushButton#btn_close {
-                    background-image: url(:/resources/icons/btn_close/default.png);
+                    background-image: url(resources/icons/btn_close/default.png);
                 }
-
                 QPushButton#btn_close:hover, QPushButton#btn_close:pressed {
-                    background-image: url(:/resources/icons/btn_close/hovered.png);
+                    background-image: url(resources/icons/btn_close/hovered.png);
                 }
             """
         )
@@ -174,15 +252,12 @@ class SettingsWindow(QDialog):
                     font: 13pt "Segoe UI";
                     padding-right: 97px;
                 }
-
                 QPushButton#btn_menu_1 {
                     color: rgb(117, 118, 121);
                 }
-
                 QPushButton#btn_menu_1:hover, QPushButton#btn_menu_1:pressed {
                     color: rgb(57, 59, 63);
                 }
-
                 QPushButton#btn_menu_1:pressed {
                     background-color: rgb(233, 233, 233);
                 }
@@ -200,15 +275,12 @@ class SettingsWindow(QDialog):
                     font: 13pt "Segoe UI";
                     padding-right: 24px;
                 }
-
                 QPushButton#btn_menu_2 {
                     color: rgb(117, 118, 121);
                 }
-
                 QPushButton#btn_menu_2:hover, QPushButton#btn_menu_2:pressed {
                     color: rgb(57, 59, 63);
                 }
-
                 QPushButton#btn_menu_2:pressed {
                     background-color: rgb(233, 233, 233);
                 }
@@ -226,15 +298,12 @@ class SettingsWindow(QDialog):
                     font: 13pt "Segoe UI";
                     padding-right: 107px;
                 }
-
                 QPushButton#btn_menu_3 {
                     color: rgb(117, 118, 121);
                 }
-
                 QPushButton#btn_menu_3:hover, QPushButton#btn_menu_3:pressed {
                     color: rgb(57, 59, 63);
                 }
-
                 QPushButton#btn_menu_3:pressed {
                     background-color: rgb(233, 233, 233);
                 }
@@ -253,15 +322,12 @@ class SettingsWindow(QDialog):
                     font: 15pt "Segoe UI";
                     text-align: center;
                 }
-
                 QPushButton#btn_cancel {
                     background-color: rgb(255, 255, 255);
                 }
-
                 QPushButton#btn_cancel:hover {
                     background-color: rgb(251, 248, 239);
                 }
-
                 QPushButton#btn_cancel:pressed {
                     background-color: rgb(236, 233, 225);
                 }
@@ -279,15 +345,12 @@ class SettingsWindow(QDialog):
                     font: 14pt "Segoe UI";
                     text-align: center;
                 }
-
                 QPushButton#btn_confirm {
                     background-color: rgb(57, 59, 64);
                 }
-
                 QPushButton#btn_confirm:hover {
                     background-color: rgb(77, 79, 83);
                 }
-
                 QPushButton#btn_confirm:pressed {
                     background-color: rgb(51, 53, 57);
                 }
@@ -298,7 +361,7 @@ class SettingsWindow(QDialog):
         #
         # Define styling for items in the scroll area
         #
-
+        # ==================== Scroll Area & Container ==================== #
         self.scroll_area.setFixedSize(QSize(582, 350))
         self.scroll_area.move(225, 75)
         self.scroll_area.setStyleSheet(
@@ -306,18 +369,15 @@ class SettingsWindow(QDialog):
                 QScrollArea#scroll_area {
                     border: 0px;
                 }
-
                 QScrollBar::vertical {
                     border: none;
                     background-color: #FFFFFF;
                     width: 6px;
                 }
-
                 QScrollBar::handle:vertical {
                     border-radius: 3px;
                     background-color: #E9ECF0;
                 }
-
                 QScrollBar::handle:vertical:hover, QScrollBar::handle:vertical:pressed {
                     background-color: #D2D5D8;
                 }
@@ -325,7 +385,7 @@ class SettingsWindow(QDialog):
         )
         self.scroll_area.raise_()
 
-        self.scroll_container.setFixedSize(QSize(576, 990))
+        self.scroll_container.setFixedSize(QSize(576, 920))
         self.scroll_container.move(0, 0)
         self.scroll_container.setStyleSheet(
             """
@@ -335,117 +395,66 @@ class SettingsWindow(QDialog):
             """
         )
 
-
-        #self.lbl_default_game.setFixedSize(QSize(150, 30))
-        #self.lbl_default_game.move(35, 10)
-        #self.lbl_default_game.setStyleSheet(
-        #    """
-        #        QLabel#lbl_default_game {
-        #        	color: rgb(57, 59, 64);
-        #            font: 15pt  "Segoe UI";
-        #        }
-        #    """
-        #)
-
-        self.lbl_path_t.setFixedSize(QSize(400, 30))
-        self.lbl_path_t.move(35, 20)
-        self.lbl_path_t.setStyleSheet(
+        # ==================== Labels ==================== #
+        self.lbl_default_game.setFixedSize(QSize(170, 30))
+        self.lbl_default_game.move(35, 10)
+        self.lbl_default_game.setStyleSheet(
             """
-                QLabel#lbl_path_t {
+                QLabel#lbl_default_game {
+                    color: rgb(57, 59, 64);
+                    font: 15pt  "Segoe UI";
+                }
+            """
+        )
+
+        self.lbl_game_paths.setFixedSize(QSize(150, 30))
+        self.lbl_game_paths.move(35, 120)
+        self.lbl_game_paths.setStyleSheet(
+            """
+                QLabel#lbl_game_paths {
                     color: rgb(57, 59, 64);
                     font: 15pt "Segoe UI";
                 }
             """
         )
 
-        self.lbl_path.move(70, 55)
-        self.lbl_path.setStyleSheet(
+        self.lbl_current_paths.move(35, 215)
+        self.lbl_current_paths.setStyleSheet(
             """
-                QLabel#lbl_path {
+                QLabel#lbl_current_paths {
                     color: rgb(148, 150, 153);
-                    font: 10pt "Segoe UI";
-                }
-            """
-        )
-        self.lbl_path.raise_()
-
-        self.lbl_launcher_path_t.setFixedSize(QSize(400, 30))
-        self.lbl_launcher_path_t.move(35, 120)
-        self.lbl_launcher_path_t.setStyleSheet(
-            """
-                QLabel#lbl_launcher_path_t {
-                    color: rgb(57, 59, 64);
-                    font: 15pt "Segoe UI";
-                }
-            """
-        )
-
-        self.lbl_launcher_path.move(70, 155)
-        self.lbl_launcher_path.setStyleSheet(
-            """
-                QLabel#lbl_launcher_path {
-                    color: rgb(148, 150, 153);
-                    font: 10pt "Segoe UI";
-                }
-            """
-        )
-        self.lbl_path.raise_()
-
-        self.btn_locate_path.setFixedSize(QSize(30, 30))
-        self.btn_locate_path.move(35, 50) # 35, 160
-        self.btn_locate_path.setStyleSheet(
-            """
-                QPushButton#btn_locate_path, QPushButton#btn_locate_path:hover, QPushButton#btn_locate_path:pressed {
-                    border: 1px solid rgb(204, 204, 204);
-                    border-radius: 5px;
-                    color: rgb(220, 188, 96);
                     font: 13pt "Segoe UI";
                 }
+            """
+        )
+        self.lbl_current_paths.raise_()
 
-                QPushButton#btn_locate_path {
-                    background-color: rgb(255, 255, 255);
-                    background-image: url(:/resources/icons/folder/change_folder.png)
-                }
-
-                QPushButton#btn_locate_path:hover {
-                    background-color: rgb(251, 248, 239);
-                }
-
-                QPushButton#btn_locate_path:pressed {
-                    background-color: rgb(236, 233, 225);
+        self.lbl_path_honkai.setFixedSize(QSize(500, 35))
+        self.lbl_path_honkai.move(35, 250)
+        self.lbl_path_honkai.setStyleSheet(
+            """
+                QLabel#lbl_path_honkai {
+                    color: rgb(148, 150, 153);
+                    font: 12pt "Segoe UI";
+                    background-color: rgb(246, 245, 243);
                 }
             """
         )
 
-        self.btn_locate_launcher_path.setFixedSize(QSize(30, 30))
-        self.btn_locate_launcher_path.move(35, 150) #300, 160
-        self.btn_locate_launcher_path.setStyleSheet(
+        self.lbl_path_genshin.setFixedSize(QSize(500, 35))
+        self.lbl_path_genshin.move(35, 290)
+        self.lbl_path_genshin.setStyleSheet(
             """
-                QPushButton#btn_locate_launcher_path, QPushButton#btn_locate_launcher_path:hover, QPushButton#btn_locate_launcher_path:pressed {
-                    border: 1px solid rgb(204, 204, 204);
-                    border-radius: 5px;
-                    color: rgb(220, 188, 96);
-                    font: 13pt "Segoe UI";
-                }
-
-                QPushButton#btn_locate_launcher_path {
-                    background-color: rgb(255, 255, 255);
-                    background-image: url(:/resources/icons/folder/change_folder.png)
-                }
-
-                QPushButton#btn_locate_launcher_path:hover {
-                    background-color: rgb(251, 248, 239);
-                }
-
-                QPushButton#btn_locate_launcher_path:pressed {
-                    background-color: rgb(236, 233, 225);
+                QLabel#lbl_path_genshin {
+                    color: rgb(148, 150, 153);
+                    font: 12pt "Segoe UI";
+                    background-color: rgb(246, 245, 243);
                 }
             """
         )
-
 
         self.lbl_screen_resolution.setFixedSize(QSize(150, 30))
-        self.lbl_screen_resolution.move(35, 420) #-30
+        self.lbl_screen_resolution.move(35, 360)
         self.lbl_screen_resolution.setStyleSheet(
             """
                 QLabel#lbl_screen_resolution {
@@ -456,7 +465,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_launcher_version.setFixedSize(QSize(150, 30))
-        self.lbl_launcher_version.move(35, 825) #-30
+        self.lbl_launcher_version.move(35, 745)
         self.lbl_launcher_version.setStyleSheet(
             """
                 QLabel#lbl_launcher_version {
@@ -467,7 +476,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_current_version.setFixedSize(QSize(165, 30))
-        self.lbl_current_version.move(35, 860)
+        self.lbl_current_version.move(35, 780)
         self.lbl_current_version.setStyleSheet(
             """
                 QLabel#lbl_current_version {
@@ -478,7 +487,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_about.setFixedSize(QSize(60, 30))
-        self.lbl_about.move(35, 920)
+        self.lbl_about.move(35, 840)
         self.lbl_about.setStyleSheet(
             """
                 QLabel#lbl_about {
@@ -489,7 +498,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_source_code.setFixedSize(QSize(140, 30))
-        self.lbl_source_code.move(35, 950)
+        self.lbl_source_code.move(35, 870)
         self.lbl_source_code.setStyleSheet(
             """
                 QLabel#lbl_source_code {
@@ -499,16 +508,240 @@ class SettingsWindow(QDialog):
             """
         )
 
+        # ==================== Buttons ==================== #
+        self.game_list.setFixedSize(QSize(170, 30))
+        self.game_list.move(35, 50)
+        self.game_list.setStyleSheet(
+            """
+                QComboBox#game_list {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
 
-        #self.game_list.setFixedSize(QSize(170, 30))
-        #self.game_list.move(35, 50)
-        #self.game_list.setStyleSheet(
-        #    """
-        #        QComboBox#game_list {
-        #            font: 13pt "Segoe UI";
-        #        }
-        #    """
-        #)
+        self.btn_locate_honkai_path.setFixedSize(QSize(240, 40))
+        self.btn_locate_honkai_path.move(35, 160)
+        self.btn_locate_honkai_path.setStyleSheet(
+            """
+                QPushButton#btn_locate_honkai_path, QPushButton#btn_locate_honkai_path:hover, QPushButton#btn_locate_honkai_path:pressed {
+                    border: 1px solid rgb(204, 204, 204);
+                    border-radius: 5px;
+                    color: rgb(220, 188, 96);
+                    font: 13pt "Segoe UI";
+                }
+                QPushButton#btn_locate_honkai_path {
+                    background-color: rgb(255, 255, 255);
+                }
+                QPushButton#btn_locate_honkai_path:hover {
+                    background-color: rgb(251, 248, 239);
+                }
+                QPushButton#btn_locate_honkai_path:pressed {
+                    background-color: rgb(236, 233, 225);
+                }
+            """
+        )
+
+        self.btn_locate_genshin_path.setFixedSize(QSize(240, 40))
+        self.btn_locate_genshin_path.move(300, 160)
+        self.btn_locate_genshin_path.setStyleSheet(
+            """
+                QPushButton#btn_locate_genshin_path, QPushButton#btn_locate_genshin_path:hover, QPushButton#btn_locate_genshin_path:pressed {
+                    border: 1px solid rgb(204, 204, 204);
+                    border-radius: 5px;
+                    color: rgb(220, 188, 96);
+                    font: 13pt "Segoe UI";
+                }
+                QPushButton#btn_locate_genshin_path {
+                    background-color: rgb(255, 255, 255);
+                }
+                QPushButton#btn_locate_genshin_path:hover {
+                    background-color: rgb(251, 248, 239);
+                }
+                QPushButton#btn_locate_genshin_path:pressed {
+                    background-color: rgb(236, 233, 225);
+                }
+            """
+        )
+
+        # ==================== Group Boxes & Its Items ==================== #
+        self.screen_resolution_container.setFixedSize(QSize(520, 310))
+        self.screen_resolution_container.move(35, 400)
+
+        self.screen_resolution_1.setFixedSize(QSize(130, 20))
+        self.screen_resolution_1.move(15, 30)
+        self.screen_resolution_1.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_1 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_2.setFixedSize(QSize(130, 20))
+        self.screen_resolution_2.move(15, 70)
+        self.screen_resolution_2.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_2 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_3.setFixedSize(QSize(130, 20))
+        self.screen_resolution_3.move(15, 110)
+        self.screen_resolution_3.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_3 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_4.setFixedSize(QSize(130, 20))
+        self.screen_resolution_4.move(205, 30)
+        self.screen_resolution_4.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_4 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_5.setFixedSize(QSize(125, 20))
+        self.screen_resolution_5.move(205, 70)
+        self.screen_resolution_5.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_5 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_6.setFixedSize(QSize(125, 20))
+        self.screen_resolution_6.move(205, 110)
+        self.screen_resolution_6.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_6 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_7.setFixedSize(QSize(125, 20))
+        self.screen_resolution_7.move(385, 30)
+        self.screen_resolution_7.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_7 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_8.setFixedSize(QSize(125, 20))
+        self.screen_resolution_8.move(385, 70)
+        self.screen_resolution_8.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_8 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_9.setFixedSize(QSize(115, 20))
+        self.screen_resolution_9.move(385, 110)
+        self.screen_resolution_9.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_9 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+
+        self.screen_resolution_10.setFixedSize(QSize(130, 20))
+        self.screen_resolution_10.move(15, 180)
+        self.screen_resolution_10.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_10 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_11.setFixedSize(QSize(130, 20))
+        self.screen_resolution_11.move(15, 220)
+        self.screen_resolution_11.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_11 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_12.setFixedSize(QSize(130, 20))
+        self.screen_resolution_12.move(15, 260)
+        self.screen_resolution_12.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_12 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_13.setFixedSize(QSize(130, 20))
+        self.screen_resolution_13.move(205, 180)
+        self.screen_resolution_13.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_13 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_14.setFixedSize(QSize(125, 20))
+        self.screen_resolution_14.move(205, 220)
+        self.screen_resolution_14.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_14 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_15.setFixedSize(QSize(120, 20))
+        self.screen_resolution_15.move(205, 260)
+        self.screen_resolution_15.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_15 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_16.setFixedSize(QSize(120, 20))
+        self.screen_resolution_16.move(385, 180)
+        self.screen_resolution_16.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_16 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_17.setFixedSize(QSize(110, 20))
+        self.screen_resolution_17.move(385, 220)
+        self.screen_resolution_17.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_17 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.screen_resolution_18.setFixedSize(QSize(110, 20))
+        self.screen_resolution_18.move(385, 260)
+        self.screen_resolution_18.setStyleSheet(
+            """
+                QRadioButton#screen_resolution_18 {
+                    font: 13pt "Segoe UI";
+                }
+            """
+        )
+        self.lbl_attention.setFixedSize(QSize(500, 20))
+        self.lbl_attention.move(40, 285)
+        self.lbl_attention.setStyleSheet(
+            """
+                QRadioButton#lbl_attention {
+                    font: 13pt "Segoe UI";
+                    algin: center;
+                }
+            """
+        )
+
+        return None
 
     def mousePressEvent(self, event):
         self.oldPos = event.globalPos()
@@ -549,44 +782,149 @@ class SettingsWindow(QDialog):
 
         return None
 
-    def btn_locate_path_event(self):
-        
-        self.new_game_path = QFileDialog.getExistingDirectory(self.scroll_container, 'Select the game installation folder')
+    def btn_locate_honkai_path_event(self):
+        self.new_honkai_path = QFileDialog.getExistingDirectory(self.scroll_container, 'Select Honkai Impact 3rd installation folder')
 
-        match self.new_game_path:
+        match self.new_honkai_path:
             case '' | None:
                 pass
             case _:
-                self.lbl_path.setText(self.new_game_path)
+                self.lbl_path_honkai.setText(self.new_honkai_path)
+                ui_config_write('PATHS', 'honkai_impact', self.new_honkai_path)
 
         return None
+    
+    def btn_locate_genshin_path_event(self):
+        self.new_genshin_path = QFileDialog.getExistingDirectory(self.scroll_container, 'Select Genshin Impact installation folder')
 
-    def btn_locate_launcher_path_event(self):
-
-        self.new_launcher_path = QFileDialog.getOpenFileName(self.scroll_container, 'Select the launcher executable')[0]
-
-        match self.new_launcher_path:
+        match self.new_genshin_path:
             case '' | None:
                 pass
             case _:
-                self.lbl_launcher_path.setText(self.new_launcher_path)
+                self.lbl_path_genshin.setText(self.new_genshin_path)
+                ui_config_write('PATHS', 'genshin_impact', self.new_genshin_path)
 
         return None
+    
+    def btn_locate_starrail_path_event(self):
+        self.new_starrail_path = QFileDialog.getExistingDirectory(self.scroll_container, 'Select Honkai: StarRail installation folder')
 
+        match self.new_starrail_path:
+            case '' | None:
+                pass
+            case _:
+                self.lbl_path_genshin.setText(self.new_starrail_path)
+                ui_config_write('PATHS', 'honkai_starrail', self.new_starrail_path)
+
+        return None
 
     def btn_confirm_event(self):
-        game_name, wallpaper_name, default = get_general()
-        del wallpaper_name, default
+        match self.game_list.currentIndex():
+            case 0:
+                game = 'honkai'
+            case 1:
+                game = 'genshin'
+            case 2:
+                game = 'starrail'
+            case _:
+                game = ''
 
-        try:
-            define(game_name, "path", self.new_game_path)
-            define(game_name, "launcher_path", self.new_launcher_path)
-        except:
-            pass
+        ui_config_write('LAUNCHER', 'game', game)
+
+        for radio_button in self.screen_resolution_group:
+            match radio_button.isChecked():
+                case True:
+                    match radio_button.objectName():
+                        case 'screen_resolution_1':
+                            ui_config_write('OPTIONS', 'screen_width', '7680')
+                            ui_config_write('OPTIONS', 'screen_height', '4320')
+                        case 'screen_resolution_2':
+                            ui_config_write('OPTIONS', 'screen_width', '6400')
+                            ui_config_write('OPTIONS', 'screen_height', '4800')
+                        case 'screen_resolution_3':
+                            ui_config_write('OPTIONS', 'screen_width', '4096')
+                            ui_config_write('OPTIONS', 'screen_height', '3072')
+                        case 'screen_resolution_4':
+                            ui_config_write('OPTIONS', 'screen_width', '3840')
+                            ui_config_write('OPTIONS', 'screen_height', '2160')
+                        case 'screen_resolution_5':
+                            ui_config_write('OPTIONS', 'screen_width', '3200')
+                            ui_config_write('OPTIONS', 'screen_height', '2400')
+                        case 'screen_resolution_6':
+                            ui_config_write('OPTIONS', 'screen_width', '2560')
+                            ui_config_write('OPTIONS', 'screen_height', '1440')
+                        case 'screen_resolution_7':
+                            ui_config_write('OPTIONS', 'screen_width', '2048')
+                            ui_config_write('OPTIONS', 'screen_height', '1536')
+                        case 'screen_resolution_8':
+                            ui_config_write('OPTIONS', 'screen_width', '1920')
+                            ui_config_write('OPTIONS', 'screen_height', '1080')
+                        case 'screen_resolution_9':
+                            ui_config_write('OPTIONS', 'screen_width', '1600')
+                            ui_config_write('OPTIONS', 'screen_height', '900')
+                        case 'screen_resolution_10':
+                            ui_config_write('OPTIONS', 'screen_width', '1440')
+                            ui_config_write('OPTIONS', 'screen_height', '900')
+                        case 'screen_resolution_11':
+                            ui_config_write('OPTIONS', 'screen_width', '1366')
+                            ui_config_write('OPTIONS', 'screen_height', '768')
+                        case 'screen_resolution_12':
+                            ui_config_write('OPTIONS', 'screen_width', '1280')
+                            ui_config_write('OPTIONS', 'screen_height', '800')
+                        case 'screen_resolution_13':
+                            ui_config_write('OPTIONS', 'screen_width', '1280')
+                            ui_config_write('OPTIONS', 'screen_height', '600')
+                        case 'screen_resolution_14':
+                            ui_config_write('OPTIONS', 'screen_width', '1024')
+                            ui_config_write('OPTIONS', 'screen_height', '768')
+                        case 'screen_resolution_15':
+                            ui_config_write('OPTIONS', 'screen_width', '1024')
+                            ui_config_write('OPTIONS', 'screen_height', '640')
+                        case 'screen_resolution_16':
+                            ui_config_write('OPTIONS', 'screen_width', '960')
+                            ui_config_write('OPTIONS', 'screen_height', '540')
+                        case 'screen_resolution_17':
+                            ui_config_write('OPTIONS', 'screen_width', '800')
+                            ui_config_write('OPTIONS', 'screen_height', '600')
+                        case 'screen_resolution_18':
+                            ui_config_write('OPTIONS', 'screen_width', '640')
+                            ui_config_write('OPTIONS', 'screen_height', '480')
+                        case _:
+                            ui_config_write('OPTIONS', 'screen_width', '1280')
+                            ui_config_write('OPTIONS', 'screen_height', '600')
+                case _:
+                    pass
 
         self.close()
 
         return None
+
+def global_variables():
+    game_name, honkai_path, genshin_path, starrail_path, screen_width, screen_height = modules.configuration.read()
+
+    match game_name:
+        case 'honkai':
+            game_exe = 'BH3.exe'
+            game_exe_path = honkai_path.joinpath(game_exe)
+            game_index = 0
+            background_image = 'resources/backgrounds/settings_genshin.png'
+        case 'genshin':
+            game_exe = 'GenshinImpact.exe'
+            game_exe_path = genshin_path.joinpath(game_exe)
+            game_index = 1
+            background_image = 'resources/backgrounds/settings_genshin.png'
+        case 'starrail':
+            game_exe = 'StarRail.exe'
+            game_exe_path = starrail_path.joinpath(game_exe)
+            game_index = 2
+            background_image = 'resources/backgrounds/settings_genshin.png'
+        case _:
+            game_exe = ''
+            game_exe_path = ''
+            game_index = 0
+            background_image = ''
+    
+    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path
 
 if __name__ == '__main__':
     pass
