@@ -34,14 +34,14 @@ class SettingsWindow(QDialog):
         return None
     
     def interface(self):
-        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path = global_variables()
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path, zenless_path = global_variables()
         del game_exe, game_exe_path, background_image
 
         # ==================== Window Properties ==================== #
         self.setWindowTitle('AnimeGameLauncher')
         self.setWindowIcon(QIcon('resources/icons/app_icon.png'))
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-        self.setFixedSize(QSize(1000, 525))
+        self.setFixedSize(QSize(820, 525))
         screen_size = QScreen.availableGeometry(QApplication.primaryScreen())
         position_x = (screen_size.width() - self.width()) / 2
         position_y = (screen_size.height() - self.height()) / 2
@@ -84,6 +84,7 @@ class SettingsWindow(QDialog):
         self.lbl_path_honkai = QLabel(parent=self.scroll_container, text=str(honkai_path), objectName='lbl_path_honkai')
         self.lbl_path_genshin = QLabel(parent=self.scroll_container, text=str(genshin_path), objectName='lbl_path_genshin')
         self.lbl_path_starrail = QLabel(parent=self.scroll_container, text=str(starrail_path), objectName='lbl_path_starrail')
+        self.lbl_path_zenless = QLabel(parent=self.scroll_container, text=str(zenless_path), objectName='lbl_path_zenless')
         self.lbl_screen_resolution = QLabel(parent=self.scroll_container, text='Screen resolution', objectName='lbl_screen_resolution')
         self.lbl_launcher_version = QLabel(parent=self.scroll_container, text='Launcher version', objectName='lbl_launcher_version')
         self.lbl_current_version = QLabel(parent=self.scroll_container, text='Current version: 1.1.5', objectName='lbl_current_version')
@@ -102,11 +103,15 @@ class SettingsWindow(QDialog):
         self.btn_locate_starrail_path = QPushButton(parent=self.scroll_container, text='Locate game files (StarRail)', objectName='btn_locate_starrail_path')
         self.btn_locate_starrail_path.clicked.connect(self.btn_locate_starrail_path_event)
 
+        self.btn_locate_zenless_path = QPushButton(parent=self.scroll_container, text='coming soon (ZZZ)', objectName='btn_locate_zenless_path')
+        self.btn_locate_zenless_path.clicked.connect(self.btn_locate_zenless_path_event)
+
         # ==================== Game List ==================== #
         self.game_list = QComboBox(parent=self.scroll_container, objectName='game_list')
         self.game_list.addItem('Honkai Impact 3rd')
         self.game_list.addItem('Genshin Impact')
         self.game_list.addItem('Honkai: StarRail')
+        self.game_list.addItem('ZZZ (Coming soon)')
         self.game_list.setCurrentIndex(game_index)
 
         # ==================== Group Boxes & Its Items ==================== #
@@ -204,12 +209,12 @@ class SettingsWindow(QDialog):
         pass
 
     def style_genshin(self):
-        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path  = global_variables()
-        del game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, honkai_path, genshin_path, starrail_path
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path, zenless_path  = global_variables()
+        del game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, honkai_path, genshin_path, starrail_path, zenless_path
 
         # ==================== Launcher Background ==================== #
         self.background_image = QLabel(parent=self, text=None, objectName='background_image')
-        self.background_image.setFixedSize(QSize(1000, 525))
+        self.background_image.setFixedSize(QSize(820, 525))
         self.background_image.setScaledContents(True)
         self.background_image.setPixmap(QPixmap(background_image))
 
@@ -388,7 +393,7 @@ class SettingsWindow(QDialog):
         )
         self.scroll_area.raise_()
 
-        self.scroll_container.setFixedSize(QSize(576, 920))
+        self.scroll_container.setFixedSize(QSize(576, 965))
         self.scroll_container.move(0, 0)
         self.scroll_container.setStyleSheet(
             """
@@ -421,7 +426,7 @@ class SettingsWindow(QDialog):
             """
         )
 
-        self.lbl_current_paths.move(35, 215)
+        self.lbl_current_paths.move(35, 255)
         self.lbl_current_paths.setStyleSheet(
             """
                 QLabel#lbl_current_paths {
@@ -433,7 +438,7 @@ class SettingsWindow(QDialog):
         self.lbl_current_paths.raise_()
 
         self.lbl_path_honkai.setFixedSize(QSize(500, 35))
-        self.lbl_path_honkai.move(35, 250)
+        self.lbl_path_honkai.move(35, 280)
         self.lbl_path_honkai.setStyleSheet(
             """
                 QLabel#lbl_path_honkai {
@@ -445,7 +450,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_path_genshin.setFixedSize(QSize(500, 35))
-        self.lbl_path_genshin.move(35, 290)
+        self.lbl_path_genshin.move(35, 320)
         self.lbl_path_genshin.setStyleSheet(
             """
                 QLabel#lbl_path_genshin {
@@ -456,8 +461,20 @@ class SettingsWindow(QDialog):
             """
         )
 
+        self.lbl_path_starrail.setFixedSize(QSize(500, 35))
+        self.lbl_path_starrail.move(35, 360)
+        self.lbl_path_starrail.setStyleSheet(
+            """
+                QLabel#lbl_path_starrail {
+                    color: rgb(148, 150, 153);
+                    font: 12pt "Segoe UI";
+                    background-color: rgb(246, 245, 243);
+                }
+            """
+        )
+
         self.lbl_screen_resolution.setFixedSize(QSize(150, 30))
-        self.lbl_screen_resolution.move(35, 360)
+        self.lbl_screen_resolution.move(35, 400)
         self.lbl_screen_resolution.setStyleSheet(
             """
                 QLabel#lbl_screen_resolution {
@@ -468,7 +485,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_launcher_version.setFixedSize(QSize(150, 30))
-        self.lbl_launcher_version.move(35, 745)
+        self.lbl_launcher_version.move(35, 785)
         self.lbl_launcher_version.setStyleSheet(
             """
                 QLabel#lbl_launcher_version {
@@ -479,7 +496,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_current_version.setFixedSize(QSize(165, 30))
-        self.lbl_current_version.move(35, 780)
+        self.lbl_current_version.move(35, 820)
         self.lbl_current_version.setStyleSheet(
             """
                 QLabel#lbl_current_version {
@@ -490,7 +507,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_about.setFixedSize(QSize(60, 30))
-        self.lbl_about.move(35, 840)
+        self.lbl_about.move(35, 880)
         self.lbl_about.setStyleSheet(
             """
                 QLabel#lbl_about {
@@ -501,7 +518,7 @@ class SettingsWindow(QDialog):
         )
 
         self.lbl_source_code.setFixedSize(QSize(140, 30))
-        self.lbl_source_code.move(35, 870)
+        self.lbl_source_code.move(35, 900)
         self.lbl_source_code.setStyleSheet(
             """
                 QLabel#lbl_source_code {
@@ -567,7 +584,7 @@ class SettingsWindow(QDialog):
         )
 
         self.btn_locate_starrail_path.setFixedSize(QSize(240, 40))
-        self.btn_locate_starrail_path.move(565, 160)
+        self.btn_locate_starrail_path.move(35, 210)
         self.btn_locate_starrail_path.setStyleSheet(
             """
                 QPushButton#btn_locate_starrail_path, QPushButton#btn_locate_starrail_path:hover, QPushButton#btn_locate_starrail_path:pressed {
@@ -588,9 +605,31 @@ class SettingsWindow(QDialog):
             """
         )
 
+        self.btn_locate_zenless_path.setFixedSize(QSize(240, 40))
+        self.btn_locate_zenless_path.move(300, 210)
+        self.btn_locate_zenless_path.setStyleSheet(
+            """
+                QPushButton#btn_locate_zenless_path, QPushButton#btn_locate_zenless_path:hover, QPushButton#btn_locate_zenless_path:pressed {
+                    border: 1px solid rgb(204, 204, 204);
+                    border-radius: 5px;
+                    color: rgb(220, 188, 96);
+                    font: 13pt "Segoe UI";
+                }
+                QPushButton#btn_locate_zenless_path {
+                    background-color: rgb(255, 255, 255);
+                }
+                QPushButton#btn_locate_zenless_path:hover {
+                    background-color: rgb(251, 248, 239);
+                }
+                QPushButton#btn_locate_zenless_path:pressed {
+                    background-color: rgb(236, 233, 225);
+                }
+            """
+        )
+
         # ==================== Group Boxes & Its Items ==================== #
         self.screen_resolution_container.setFixedSize(QSize(520, 310))
-        self.screen_resolution_container.move(35, 400)
+        self.screen_resolution_container.move(35, 440)
 
         self.screen_resolution_1.setFixedSize(QSize(130, 20))
         self.screen_resolution_1.move(15, 30)
@@ -838,8 +877,20 @@ class SettingsWindow(QDialog):
             case '' | None:
                 pass
             case _:
-                self.lbl_path_genshin.setText(self.new_starrail_path)
+                self.lbl_path_starrail.setText(self.new_starrail_path)
                 ui_config_write('PATHS', 'honkai_starrail', self.new_starrail_path)
+
+        return None
+    
+    def btn_locate_zenless_path_event(self):
+        self.new_zenless_path = QFileDialog.getExistingDirectory(self.scroll_container, 'Select ZenlessZoneZero installation folder')
+
+        match self.new_zenless_path:
+            case '' | None:
+                pass
+            case _:
+                self.lbl_path_zenless.setText(self.new_zenless_path)
+                ui_config_write('PATHS', 'zenlesszonezero', self.new_zenless_path)
 
         return None
 
@@ -851,8 +902,8 @@ class SettingsWindow(QDialog):
                 game = 'genshin'
             case 2:
                 game = 'starrail'
-            case _:
-                game = ''
+            case 4:
+                game = 'zenless'
 
         ui_config_write('LAUNCHER', 'game', game)
 
@@ -925,7 +976,7 @@ class SettingsWindow(QDialog):
         return None
 
 def global_variables():
-    game_name, honkai_path, genshin_path, starrail_path, screen_width, screen_height = modules.configuration.read()
+    game_name, honkai_path, genshin_path, starrail_path, zenless_path, screen_width, screen_height = modules.configuration.read()
 
     match game_name:
         case 'honkai':
@@ -943,13 +994,13 @@ def global_variables():
             game_exe_path = starrail_path.joinpath(game_exe)
             game_index = 2
             background_image = 'resources/backgrounds/settings_genshin.png'
-        case _:
-            game_exe = ''
-            game_exe_path = ''
-            game_index = 0
-            background_image = ''
+        case 'zenless':
+            game_exe = 'ZZZ.exe'
+            game_exe_path = zenless_path.joinpath(game_exe)
+            game_index = 3
+            background_image = 'resources/backgrounds/settings_genshin.png'
     
-    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path
+    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image, honkai_path, genshin_path, starrail_path, zenless_path
 
 if __name__ == '__main__':
     pass

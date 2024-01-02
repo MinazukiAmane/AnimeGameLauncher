@@ -43,8 +43,8 @@ class MainWindow(QMainWindow):
         return None
 
     def interface(self):
-        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, url_list = global_variables()
-        del game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, honkai_path, genshin_path, starrail_path, url_list
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path, url_list = global_variables()
+        del game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, honkai_path, genshin_path, starrail_path, zenless_path, url_list
 
         self.central_widget = QMainWindow()
         self.setCentralWidget(self.central_widget)
@@ -90,7 +90,7 @@ class MainWindow(QMainWindow):
 
         self.app_version = QLabel(self, text='1.1.5', objectName='app_version')
         self.app_version.setFixedSize(QSize(40, 30))
-        self.app_version.move(65, 0)
+        self.app_version.move(135, 0)
         self.app_version.setStyleSheet(
             """
                 QLabel#app_version {
@@ -400,7 +400,7 @@ class MainWindow(QMainWindow):
         )
         self.btn_url_hoyolab.clicked.connect(lambda: self.btn_url_event('hoyolab'))
 
-        game_name, honkai_path, genshin_path, starrail_path, screen_width, screen_height = modules.configuration.read()
+        game_name, honkai_path, genshin_path, starrail_path, zenless_path, screen_width, screen_height = modules.configuration.read()
 
         self.btn_url_swap = QPushButton(self, text=None, objectName='btn_url_swap', flat=True)
         self.btn_url_swap.setFixedSize(QSize(63, 63))
@@ -434,6 +434,22 @@ class MainWindow(QMainWindow):
                     QPushButton#btn_url_swap:pressed {
                         border: 2px solid rgb(255, 205, 125);
                         background-image: url(resources/icons/change_game/honkai.png);
+                    }
+
+                    QPushButton#btn_url_swap {
+                        border: 2px solid rgba(255, 255, 255, 0);
+                        background-image: url(resources/icons/change_game/starrail.png);
+                        background-color: rgba(20, 20, 20, 0.6);
+                    }
+
+                    QPushButton#btn_url_swap:hover {
+                        border: 2px solid rgb(255, 225, 145);
+                        background-image: url(resources/icons/change_game/starrail.png);
+                    }
+
+                    QPushButton#btn_url_swap:pressed {
+                        border: 2px solid rgb(255, 205, 125);
+                        background-image: url(resources/icons/change_game/starrail.png);
                     }
                 """
                     )
@@ -472,6 +488,22 @@ class MainWindow(QMainWindow):
                         border: 2px solid rgb(255, 205, 125);
                         background-image: url(resources/icons/change_game/genshin.png);
                     }
+
+                    QPushButton#btn_url_swap {
+                        border: 2px solid rgba(255, 255, 255, 0);
+                        background-image: url(resources/icons/change_game/honkai.png);
+                        background-color: rgba(20, 20, 20, 0.6);
+                    }
+
+                    QPushButton#btn_url_swap:hover {
+                        border: 2px solid rgb(255, 225, 145);
+                        background-image: url(resources/icons/change_game/honkai.png);
+                    }
+
+                    QPushButton#btn_url_swap:pressed {
+                        border: 2px solid rgb(255, 205, 125);
+                        background-image: url(resources/icons/change_game/honkai.png);
+                    }
                 """
                     )
         self.btn_url_swap2.clicked.connect(lambda: self.btn_url_event('genshin'))
@@ -508,6 +540,9 @@ class MainWindow(QMainWindow):
             case 'starrail':
                 self.btn_main_launch = QPushButton(self, text='Launch', objectName='btn_main_launch', flat=True)
                 self.btn_main_launch.setEnabled(True)
+            case 'zenless':
+                self.btn_main_launch = QPushButton(self, text='ComingSoon', objectName='btn_main_launch', flat=True)
+                self.btn_main_launch.setEnabled(False)
 
         self.btn_main_launch.setFixedSize(QSize(240, 65))
         self.btn_main_launch.move(800, 555)
@@ -574,8 +609,8 @@ class MainWindow(QMainWindow):
         return None
 
     def btn_url_event(self, destination):
-        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, url_list = global_variables()
-        del game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path, url_list = global_variables()
+        del game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path
 
         match game_name:
             case 'honkai':
@@ -644,8 +679,8 @@ class MainWindow(QMainWindow):
         return None
 
     def btn_launch_event(self):
-        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, url_list = global_variables()
-        del game_name, game_index, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, url_list
+        game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path, url_list = global_variables()
+        del game_name, game_index, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path, url_list
 
         launch_command = f'{game_exe_path} -screen-fullscreen 0 -screen-width {screen_width} -screen-height {screen_height}'
 
@@ -663,7 +698,7 @@ class MainWindow(QMainWindow):
             subprocess.Popen('Launcher.exe', startupinfo=info)
 
 def global_variables():
-    game_name, honkai_path, genshin_path, starrail_path, screen_width, screen_height = modules.configuration.read()
+    game_name, honkai_path, genshin_path, starrail_path, zenless_path, screen_width, screen_height = modules.configuration.read()
     background_image_path = pathlib.Path(__file__).parents[1].resolve().joinpath('backgrounds')
 
     match game_name:
@@ -698,7 +733,7 @@ def global_variables():
         'https://hsr.hoyoverse.com/'
     ]
     
-    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, url_list
+    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path, url_list
 
 if __name__ == '__main__':
     pass

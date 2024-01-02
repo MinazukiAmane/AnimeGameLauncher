@@ -20,7 +20,7 @@ else:
 
 
 def global_variables():
-    game_name, honkai_path, genshin_path, starrail_path, screen_width, screen_height = modules.configuration.read()
+    game_name, honkai_path, genshin_path, starrail_path, zenless_path, screen_width, screen_height = modules.configuration.read()
     background_image_path = pathlib.Path(__file__).parents[1].resolve().joinpath('backgrounds')
 
     match game_name:
@@ -39,11 +39,11 @@ def global_variables():
             game_exe_path = starrail_path.joinpath(game_exe)
             game_index = 2
             launcher_image = background_image_path.joinpath('starrail.png')
-        case _:
-            game_exe = ''
-            game_exe_path = ''
-            game_index = 0
-            launcher_image = background_image_path
+        case 'zenless':
+            game_exe = 'ZZZ.exe'
+            game_exe_path = zenless_path.joinpath(game_exe)
+            game_index = 3
+            launcher_image = background_image_path,joinpath('zenless.png')
     
     url_list = [
         'https://honkaiimpact3.mihoyo.com/global', 'https://genshin.mihoyo.com', 'https://hsr.hoyoverse.com',
@@ -55,7 +55,7 @@ def global_variables():
         'https://github.com/MinazukiAmane/AnimeGameLauncher'
     ]
     
-    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, url_list
+    return game_name, game_exe, game_exe_path, game_index, screen_width, screen_height, background_image_path, launcher_image, honkai_path, genshin_path, starrail_path, zenless_path, url_list
 
 if __name__ == '__main__':
     pass

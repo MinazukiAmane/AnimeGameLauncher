@@ -36,7 +36,8 @@ def initialize():
             parser['PATHS'] = {
                 'honkai_impact': '',
                 'genshin_impact': '',
-                'honkai_starrail': ''
+                'honkai_starrail': '',
+                'zenlesszenzero': ''
             }
             parser['OPTIONS'] = {
                 'screen_width': '1280',
@@ -64,11 +65,12 @@ def read():
                 honkai_path = pathlib.Path(parser.get('PATHS', r'honkai_impact'))
                 genshin_path = pathlib.Path(parser.get('PATHS', r'genshin_impact'))
                 starrail_path = pathlib.Path(parser.get('PATHS', r'honkai_starrail'))
+                zenless_path = pathlib.Path(parser.get('PATHS', r'zenlesszenzero'))
                 screen_width = parser.getint('OPTIONS', 'screen_width')
                 screen_height = parser.getint('OPTIONS', 'screen_height')
                 #enable_reshade = parser.getboolean('OPTIONS', 'enable_reshade')
 
-                return game_name, honkai_path, genshin_path, starrail_path, screen_width, screen_height #,enable_reshade
+                return game_name, honkai_path, genshin_path, starrail_path, zenless_path, screen_width, screen_height #,enable_reshade
         case _:
             pass
     
